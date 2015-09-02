@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class Piece : MonoBehaviour {
 
-	private int size = 40;
+	private int size = 10;
 	private byte[,,]content;
 
 	//0 nada
@@ -25,9 +25,7 @@ public class Piece : MonoBehaviour {
 			}
 		}
 
-		mesh = new Mesh();
-		GetComponent<MeshFilter> ().mesh = mesh;
-		meshCollider = GetComponent<MeshCollider> ();
+	
 	    
 		Generate ();
 	}
@@ -111,6 +109,14 @@ public class Piece : MonoBehaviour {
 	}
 	// Update is called once per frame
 	private void Generate(){
+
+		mesh = new Mesh();
+		GetComponent<MeshFilter> ().mesh = mesh;
+		meshCollider = GetComponent<MeshCollider> ();
+
+		vertices.Clear ();
+		triangles.Clear ();
+
 		mesh.triangles = triangles.ToArray ();
 
 		for (int x=0; x<size; x++) {
@@ -134,5 +140,17 @@ public class Piece : MonoBehaviour {
 		meshCollider.sharedMesh.Clear ();
 		meshCollider.sharedMesh = mesh;
 
+	}
+
+	public void SetBlock(int x, int y, int z, byte block){
+		if ((x < 0) || (y < 0) || (z < 0) || (x >= size) || (y >= size) || (z >= size))
+			return ;
+
+		Debug.Log (x+" "+y+"  "+z);
+
+		if (content [x, y, z] != block) {
+			content [x, y, z] = block;
+			Generate();
+		}
 	}
 }
