@@ -3,7 +3,9 @@ using System.Collections;
 
 public class PlayerInteraction : MonoBehaviour {
 
-	// Use this for initialization
+
+	private byte currentBlock=1;
+
 	void Start () {
 	
 	}
@@ -13,6 +15,11 @@ public class PlayerInteraction : MonoBehaviour {
 	   
 		//botao direito = criar bloco
 		//botao esquerdo = destruir bloco
+
+		if(Input.GetKeyDown(KeyCode.Alpha1))currentBlock=1;
+		if(Input.GetKeyDown(KeyCode.Alpha2))currentBlock=2;
+		if(Input.GetKeyDown(KeyCode.Alpha3))currentBlock=3;
+		if(Input.GetKeyDown(KeyCode.Alpha4))currentBlock=4;
 
 		if (Input.GetMouseButtonDown (0)) {
 
@@ -43,6 +50,6 @@ public class PlayerInteraction : MonoBehaviour {
 	void Create(Vector3 position, GameObject piece){
 		Piece p = piece.GetComponent<Piece> ();
 		
-		 p.SetBlock (Mathf.RoundToInt(position.x),Mathf.RoundToInt(position.y),Mathf.RoundToInt(position.z),1);
+		p.SetBlock (Mathf.RoundToInt(position.x),Mathf.RoundToInt(position.y),Mathf.RoundToInt(position.z),currentBlock);
 	}
 }

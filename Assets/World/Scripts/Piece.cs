@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class Piece : MonoBehaviour {
 
-	private int size = 10;
+	private int size = 30;
 	private byte[,,]content;
 
 	//0 nada
@@ -14,13 +14,14 @@ public class Piece : MonoBehaviour {
 	protected MeshCollider meshCollider;
 	protected List<Vector3> vertices = new List<Vector3>();
 	protected List<int> triangles = new List<int>();
+	protected List<Vector2> uvs = new List<Vector2>();
 
 	// Use this for initialization
 	void Start () {
 		content = new byte[size,size,size];
 		for (int x=0; x<size; x++) {
 			for (int z=0; z<size; z++) {
-				content[x,0,z] = 1;
+				content[x,0,z] = 2;
 				content[x,1,z]= (byte)Mathf.RoundToInt(Random.value);
 			}
 		}
@@ -29,7 +30,7 @@ public class Piece : MonoBehaviour {
 	    
 		Generate ();
 	}
-	private void GenerateBlock(int x, int y, int z){
+	private void GenerateBlock(int x, int y, int z, byte block){
 
 		Vector3 start = new Vector3 (x, y, z);
 		Vector3 dim1, dim2;
@@ -38,14 +39,14 @@ public class Piece : MonoBehaviour {
 			dim1 = Vector3.left;
 			dim2 = Vector3.up;
 
-			GenerateFace(start+Vector3.right+Vector3.back, dim1,dim2);
+			GenerateFace(start+Vector3.right+Vector3.back, dim1,dim2,block);
 
 		}
 		if (ItsTransparent (x, y, z + 1)) {
 			dim1 = Vector3.right;
 			dim2 = Vector3.up;
 			
-			GenerateFace(start, dim1,dim2);
+			GenerateFace(start, dim1,dim2,block);
 			
 		}
 
@@ -53,7 +54,7 @@ public class Piece : MonoBehaviour {
 			dim1 = Vector3.up;
 			dim2 = Vector3.back;
 			
-			GenerateFace(start, dim1,dim2);
+			GenerateFace(start, dim1,dim2,block);
 			
 		}
 
@@ -61,7 +62,7 @@ public class Piece : MonoBehaviour {
 			dim1 = Vector3.down;
 			dim2 = Vector3.back;
 			
-			GenerateFace(start+Vector3.right + Vector3.up, dim1,dim2);
+			GenerateFace(start+Vector3.right + Vector3.up, dim1,dim2,block);
 			
 		}
 
@@ -69,7 +70,7 @@ public class Piece : MonoBehaviour {
 			dim1 = Vector3.left;
 			dim2 = Vector3.back;
 			
-			GenerateFace(start+Vector3.right, dim1,dim2);
+			GenerateFace(start+Vector3.right, dim1,dim2,block);
 			
 		}
 
@@ -77,13 +78,13 @@ public class Piece : MonoBehaviour {
 			dim1 = Vector3.right;
 			dim2 = Vector3.back;
 			
-			GenerateFace(start+Vector3.up, dim1,dim2);
+			GenerateFace(start+Vector3.up, dim1,dim2,block);
 			
 		}
 
 
 	}
-	private void  GenerateFace(Vector3 start, Vector3 dim1, Vector3 dim2){
+	private void  GenerateFace(Vector3 start, Vector3 dim1, Vector3 dim2, byte block){
 
 		int cont = vertices.Count;
 
@@ -92,10 +93,23 @@ public class Piece : MonoBehaviour {
 		vertices.Add (start+dim2);
 		vertices.Add (start+dim1+dim2);
 
+
+		Vector2 uvBase = new Vector2 (0f, 0.5f);
+        
+		if(block ==2)uvBase = new Vector2 (0f, 0f);
+		else if(block ==3)uvBase = new Vector2 (0.5f, 0.5f);
+		else if(block ==4)uvBase = new Vector2 (0.5f, 0f);
+
+
+		uvs.Add (uvBase);
+		uvs.Add (uvBase + new Vector2(0f,0.5f));
+		uvs.Add (uvBase + new Vector2(0.5f,0f));
+		uvs.Add (uvBase + new Vector2(0.5f,0.5f));
+
+
 		triangles.Add (cont);
 		triangles.Add (cont+1);
 		triangles.Add (cont+2);
-
 		triangles.Add (cont+3);
 		triangles.Add (cont+2);
 		triangles.Add (cont+1);
@@ -116,6 +130,7 @@ public class Piece : MonoBehaviour {
 
 		vertices.Clear ();
 		triangles.Clear ();
+		uvs.Clear ();
 
 		mesh.triangles = triangles.ToArray ();
 
@@ -126,7 +141,7 @@ public class Piece : MonoBehaviour {
 					byte block = content[x,y,z];
 
 					if(block==0)continue;
-					else GenerateBlock(x,y,z);
+					else GenerateBlock(x,y,z,block);
 
 				}
 			}
@@ -134,6 +149,7 @@ public class Piece : MonoBehaviour {
 
 		mesh.vertices = vertices.ToArray ();
 		mesh.triangles = triangles.ToArray ();
+		mesh.uv = uvs.ToArray ();
 
 		mesh.RecalculateNormals ();
 
